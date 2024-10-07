@@ -1,0 +1,260 @@
+{
+  "name": "ControlLoop",
+  "tagType": "Folder",
+  "tags": [
+    {
+      "valueSource": "memory",
+      "historicalDeadband": 1.0E-4,
+      "historicalDeadbandStyle": "Discrete",
+      "formatString": "#,##0.00",
+      "engLimitMode": "No_Clamp",
+      "tagType": "AtomicTag",
+      "dataType": "Float8",
+      "historyProvider": "Sample_SQLite_Database",
+      "name": "CV",
+      "historyEnabled": true,
+      "deadbandMode": "Off",
+      "value": 40.0
+    },
+    {
+      "valueSource": "memory",
+      "dataType": "Float8",
+      "historyProvider": "Sample_SQLite_Database",
+      "historicalDeadband": 1.0E-4,
+      "historicalDeadbandStyle": "Discrete",
+      "name": "SP",
+      "historyEnabled": true,
+      "deadbandMode": "Off",
+      "formatString": "#,##0.00000",
+      "value": 0.08,
+      "tagType": "AtomicTag"
+    },
+    {
+      "valueSource": "memory",
+      "dataType": "Float8",
+      "historyProvider": "Sample_SQLite_Database",
+      "historicalDeadband": 1.0E-4,
+      "historicalDeadbandStyle": "Discrete",
+      "name": "PV",
+      "historyEnabled": true,
+      "deadbandMode": "Off",
+      "formatString": "#,##0.00000",
+      "value": 0.07980160765281318,
+      "tagType": "AtomicTag"
+    },
+    {
+      "valueSource": "memory",
+      "dataType": "Float8",
+      "name": "Load",
+      "deadbandMode": "Off",
+      "formatString": "#,##0.00",
+      "value": 0.0,
+      "tagType": "AtomicTag"
+    },
+    {
+      "name": "PID",
+      "typeId": "PID_Algorithm",
+      "tagType": "UdtInstance",
+      "tags": [
+        {
+          "value": 0.1905579337970753,
+          "name": "P",
+          "tagType": "AtomicTag"
+        },
+        {
+          "value": false,
+          "name": "EN",
+          "tagType": "AtomicTag"
+        },
+        {
+          "value": 0.07993648068873431,
+          "name": "PVx",
+          "tagType": "AtomicTag"
+        },
+        {
+          "sourceTagPath": "[.]../PV",
+          "name": "PV",
+          "tagType": "AtomicTag"
+        },
+        {
+          "value": 6.351931126569177E-5,
+          "name": "E",
+          "tagType": "AtomicTag"
+        },
+        {
+          "sourceTagPath": "[.]../CV",
+          "name": "CV",
+          "tagType": "AtomicTag"
+        },
+        {
+          "value": 40.06118615823419,
+          "name": "I",
+          "tagType": "AtomicTag"
+        },
+        {
+          "name": "CVmax",
+          "tagType": "AtomicTag"
+        },
+        {
+          "value": 100.0,
+          "name": "Ki",
+          "tagType": "AtomicTag"
+        },
+        {
+          "value": 3000.0,
+          "name": "Kp",
+          "tagType": "AtomicTag"
+        },
+        {
+          "name": "T",
+          "tagType": "AtomicTag"
+        },
+        {
+          "name": "CVmin",
+          "tagType": "AtomicTag"
+        },
+        {
+          "sourceTagPath": "[.]../SP",
+          "name": "SP",
+          "tagType": "AtomicTag"
+        },
+        {
+          "value": -0.003219099330865199,
+          "name": "D",
+          "tagType": "AtomicTag"
+        },
+        {
+          "value": 200.0,
+          "name": "Kd",
+          "tagType": "AtomicTag"
+        }
+      ]
+    },
+    {
+      "valueSource": "expr",
+      "eventScripts": [
+        {
+          "eventid": "valueChanged",
+          "script": "\ttimestamp \u003d system.date.now()\n\ttagPaths \u003d [\n\t\t\"[.]PV\",\n\t\t\"[.]SP\",\n\t\t\"[.]CV\",\n\t\t\"[.]Load\"\n\t]\n\t\n\t(pv, sp, cv, load) \u003d tuple([x.value for x in system.tag.readBlocking(tagPaths)])\n\t\n\tcvx \u003d (cv-load)/500\n\t\n\timport random\n\t\n\tnoise \u003d 0.0025\n\t\n\tpv +\u003d (cvx - pv)/100.0\n\tpv +\u003d ((random.random()-0.5)*pv*noise)\n\t\n\tsystem.tag.writeBlocking([\"[.]PV\"], [pv])"
+        }
+      ],
+      "expression": "now(100)",
+      "dataType": "DateTime",
+      "name": "Timestamp",
+      "formatString": "yyyy-MM-dd h:mm:ss aa",
+      "tagType": "AtomicTag"
+    },
+    {
+      "valueSource": "memory",
+      "eventScripts": [
+        {
+          "eventid": "valueChanged",
+          "script": "\tif currentValue.value:\n\t\tcv \u003d system.tag.readBlocking([\"[.]CV\"])[0].value\n\t\tsystem.tag.writeBlocking([\"[.]CV\"], [cv-1])"
+        }
+      ],
+      "dataType": "Boolean",
+      "name": "PB_Down",
+      "value": false,
+      "tagType": "AtomicTag"
+    },
+    {
+      "name": "X1",
+      "typeId": "X_Algorithm",
+      "parameters": {
+        "ActionOnTime": {
+          "dataType": "Integer",
+          "value": 250
+        },
+        "ExecutionInterval": {
+          "dataType": "Integer",
+          "value": 250
+        },
+        "ActionOffTime": {
+          "dataType": "Integer",
+          "value": 250
+        }
+      },
+      "tagType": "UdtInstance",
+      "tags": [
+        {
+          "sourceTagPath": "[.]../PB_Up",
+          "name": "Au",
+          "tagType": "AtomicTag"
+        },
+        {
+          "sourceTagPath": "[.]../PB_Down",
+          "name": "Ad",
+          "tagType": "AtomicTag"
+        },
+        {
+          "valueSource": "memory",
+          "expression": "{[.]SP}*100",
+          "value": 15.0,
+          "name": "Ki",
+          "tagType": "AtomicTag"
+        },
+        {
+          "value": true,
+          "name": "EN",
+          "tagType": "AtomicTag"
+        },
+        {
+          "sourceTagPath": "[.]../PV",
+          "formatString": "#,##0.00000",
+          "name": "PV",
+          "tagType": "AtomicTag"
+        },
+        {
+          "value": 0,
+          "name": "Tu",
+          "tagType": "AtomicTag"
+        },
+        {
+          "name": "T",
+          "tagType": "AtomicTag"
+        },
+        {
+          "value": 0,
+          "name": "Td",
+          "tagType": "AtomicTag"
+        },
+        {
+          "value": 750.0,
+          "name": "Kd",
+          "tagType": "AtomicTag"
+        },
+        {
+          "formatString": "#,##0.00000",
+          "value": 0.07980567995031661,
+          "name": "PVx",
+          "tagType": "AtomicTag"
+        },
+        {
+          "formatString": "#,##0.00000",
+          "value": -0.11990426458476736,
+          "name": "I",
+          "tagType": "AtomicTag"
+        },
+        {
+          "sourceTagPath": "[.]../SP",
+          "formatString": "#,##0.00000",
+          "name": "SP",
+          "tagType": "AtomicTag"
+        }
+      ]
+    },
+    {
+      "valueSource": "memory",
+      "eventScripts": [
+        {
+          "eventid": "valueChanged",
+          "script": "\tif currentValue.value:\n\t\tcv \u003d system.tag.readBlocking([\"[.]CV\"])[0].value\n\t\tsystem.tag.writeBlocking([\"[.]CV\"], [cv+1])"
+        }
+      ],
+      "dataType": "Boolean",
+      "name": "PB_Up",
+      "value": false,
+      "tagType": "AtomicTag"
+    }
+  ]
+}

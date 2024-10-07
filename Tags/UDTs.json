@@ -1,0 +1,251 @@
+{
+  "tags": [
+    {
+      "name": "X_Algorithm",
+      "parameters": {
+        "ExecutionInterval": {
+          "dataType": "Integer",
+          "value": 250
+        },
+        "ActionOnTime": {
+          "dataType": "Integer",
+          "value": 500
+        },
+        "ActionOffTime": {
+          "dataType": "Integer",
+          "value": 5000
+        }
+      },
+      "tagType": "UdtType",
+      "tags": [
+        {
+          "valueSource": "reference",
+          "dataType": "Boolean",
+          "name": "Ad",
+          "tagType": "AtomicTag"
+        },
+        {
+          "valueSource": "memory",
+          "dataType": "Float8",
+          "name": "PVx",
+          "tagType": "AtomicTag"
+        },
+        {
+          "valueSource": "reference",
+          "dataType": "Float8",
+          "name": "SP",
+          "deadbandMode": "Off",
+          "tagType": "AtomicTag"
+        },
+        {
+          "valueSource": "reference",
+          "dataType": "Boolean",
+          "name": "Au",
+          "tagType": "AtomicTag"
+        },
+        {
+          "valueSource": "memory",
+          "dataType": "Float8",
+          "name": "I",
+          "deadbandMode": "Off",
+          "value": 1,
+          "tagType": "AtomicTag"
+        },
+        {
+          "valueSource": "memory",
+          "dataType": "Float8",
+          "name": "Kd",
+          "value": 0,
+          "tagType": "AtomicTag"
+        },
+        {
+          "valueSource": "expr",
+          "eventScripts": [
+            {
+              "eventid": "valueChanged",
+              "script": "\ttagPath \u003d \"[.]\"\n\ttagPaths \u003d [t.replace(\"/tagPath/\", tagPath) for t in [\n\t\t\"/tagPath/EN\",\n\t\t\"/tagPath/I\",\n\t\t\"/tagPath/Kd\",\n\t\t\"/tagPath/Ki\",\n\t\t\"/tagPath/PV\",\n\t\t\"/tagPath/PVx\",\n\t\t\"/tagPath/SP\",\n\t\t\"/tagPath/Td\",\n\t\t\"/tagPath/Tu\"\n\t]]\n\t\n\tei \u003d tag[\u0027parameters\u0027][\u0027ExecutionInterval\u0027]\n\tton \u003d tag[\u0027parameters\u0027][\u0027ActionOnTime\u0027]\n\ttoff \u003d tag[\u0027parameters\u0027][\u0027ActionOffTime\u0027]\n\t\n\ttags \u003d system.tag.readBlocking(tagPaths)\n\t\n\tif not all([x.quality.isGood() for x in tags]): return\n\t\n\t(en, i, kd, ki, pv, pvx, sp, td, tu) \u003d tuple([x.value for x in tags])\n\t\n\tif not en: return\n\t\n\te \u003d sp - pv\n\t\n\tif pvx is None: pvx \u003d pv\n\t\n\ttagPaths \u003d [\n\t\t\"/tagPath/I\",\n\t\t\"/tagPath/PVx\",\n\t\t\"/tagPath/Td\",\n\t\t\"/tagPath/Tu\",\n\t]\n\tvalues \u003d [i, pv, td, tu]\n\t\n\tif td \u003e 0:\n\t\tif td \u003e toff and td - ei \u003c\u003d toff:\n\t\t\ttagPaths.append(\"/tagPath/Ad\")\n\t\t\tvalues.append(False)\n\t\ttd -\u003d ei\n\tif td \u003c 0: td \u003d 0\n\tif tu \u003e 0:\n\t\tif tu \u003e toff and tu - ei \u003c\u003d toff:\n\t\t\ttagPaths.append(\"/tagPath/Au\")\n\t\t\tvalues.append(False)\n\t\ttu -\u003d ei\n\tif tu \u003c 0: tu \u003d 0\n\t\n\t\n\t\n\tif ki is not None:\n\t\ti +\u003d  e * ki * ei / 1000\n\telse:\n\t\ti \u003d 0.0\n\t\n\tif kd is not None:\n\t\ti +\u003d (pvx - pv) * kd * ei / 1000\n\t\n\t\n\tif i \u003c\u003d -1.0:\n\t\tif td \u003d\u003d 0 and tu \u003d\u003d 0:\n\t\t\ti +\u003d 1.0\n\t\t\ttd \u003d ton + toff\n\t\t\ttagPaths.append(\"/tagPath/Ad\")\n\t\t\tvalues.append(True)\n\t\telse:\n\t\t\ti \u003d 1.0\n\t\n\tif i \u003e\u003d 1.0:\n\t\tif td \u003d\u003d 0 and tu \u003d\u003d 0:\n\t\t\ti -\u003d 1.0\n\t\t\ttu \u003d ton + toff\n\t\t\ttagPaths.append(\"/tagPath/Au\")\n\t\t\tvalues.append(True)\n\t\telse:\n\t\t\ti \u003d -1.0\n\t\n\tvalues[0] \u003d i\n\tvalues[1] \u003d pv\n\tvalues[2] \u003d td\n\tvalues[3] \u003d tu\n\t\n\ttagPaths \u003d [t.replace(\"/tagPath/\", tagPath) for t in tagPaths]\n\tsystem.tag.writeBlocking(tagPaths, values)"
+            }
+          ],
+          "expression": "now({ExecutionInterval})",
+          "dataType": "DateTime",
+          "name": "T",
+          "formatString": "yyyy-MM-dd h:mm:ss aa",
+          "tagType": "AtomicTag"
+        },
+        {
+          "valueSource": "memory",
+          "name": "Tu",
+          "value": 0,
+          "tagType": "AtomicTag"
+        },
+        {
+          "valueSource": "reference",
+          "dataType": "Float8",
+          "name": "PV",
+          "deadbandMode": "Off",
+          "tagType": "AtomicTag"
+        },
+        {
+          "valueSource": "memory",
+          "name": "Td",
+          "value": 0,
+          "tagType": "AtomicTag"
+        },
+        {
+          "valueSource": "memory",
+          "dataType": "Boolean",
+          "name": "EN",
+          "value": false,
+          "tagType": "AtomicTag"
+        },
+        {
+          "valueSource": "memory",
+          "dataType": "Float8",
+          "name": "Ki",
+          "value": 0,
+          "tagType": "AtomicTag"
+        }
+      ]
+    },
+    {
+      "name": "PID_Algorithm",
+      "typeId": "",
+      "parameters": {
+        "LoopIntervalMillis": {
+          "dataType": "Integer",
+          "value": 250
+        }
+      },
+      "tagType": "UdtType",
+      "tags": [
+        {
+          "valueSource": "memory",
+          "dataType": "Float8",
+          "name": "E",
+          "deadbandMode": "Off",
+          "formatString": "#,##0.00000",
+          "value": 0.0,
+          "tagType": "AtomicTag"
+        },
+        {
+          "valueSource": "memory",
+          "dataType": "Float8",
+          "name": "P",
+          "deadbandMode": "Off",
+          "formatString": "#,##0.00000",
+          "value": 0.0,
+          "tagType": "AtomicTag"
+        },
+        {
+          "valueSource": "memory",
+          "dataType": "Float8",
+          "name": "Ki",
+          "deadbandMode": "Off",
+          "tagType": "AtomicTag"
+        },
+        {
+          "valueSource": "memory",
+          "dataType": "Boolean",
+          "name": "EN",
+          "deadbandMode": "Off",
+          "value": false,
+          "tagType": "AtomicTag"
+        },
+        {
+          "valueSource": "memory",
+          "dataType": "Float8",
+          "name": "D",
+          "deadbandMode": "Off",
+          "formatString": "#,##0.00000",
+          "value": 0.0,
+          "tagType": "AtomicTag"
+        },
+        {
+          "valueSource": "memory",
+          "dataType": "Float8",
+          "name": "I",
+          "deadbandMode": "Off",
+          "value": 0.0,
+          "tagType": "AtomicTag"
+        },
+        {
+          "valueSource": "memory",
+          "dataType": "Float8",
+          "name": "PVx",
+          "formatString": "#,##0.00000",
+          "tagType": "AtomicTag"
+        },
+        {
+          "valueSource": "memory",
+          "dataType": "Float8",
+          "name": "Kd",
+          "deadbandMode": "Off",
+          "tagType": "AtomicTag"
+        },
+        {
+          "valueSource": "reference",
+          "dataType": "Float8",
+          "name": "SP",
+          "deadbandMode": "Off",
+          "formatString": "#,##0.00000",
+          "tagType": "AtomicTag"
+        },
+        {
+          "valueSource": "reference",
+          "dataType": "Float8",
+          "name": "PV",
+          "deadbandMode": "Off",
+          "formatString": "#,##0.00000",
+          "tagType": "AtomicTag"
+        },
+        {
+          "valueSource": "memory",
+          "dataType": "Float8",
+          "name": "Kp",
+          "deadbandMode": "Off",
+          "value": 1.0,
+          "tagType": "AtomicTag"
+        },
+        {
+          "valueSource": "memory",
+          "dataType": "Float8",
+          "name": "CVmax",
+          "formatString": "#,##0.00000",
+          "value": 100,
+          "tagType": "AtomicTag"
+        },
+        {
+          "valueSource": "memory",
+          "dataType": "Float8",
+          "name": "CVmin",
+          "formatString": "#,##0.00000",
+          "value": 0,
+          "tagType": "AtomicTag"
+        },
+        {
+          "valueSource": "expr",
+          "eventScripts": [
+            {
+              "eventid": "valueChanged",
+              "script": "\tsystem.tag.writeAsync([\"[.]Tx\"], [currentValue.value])\n\t\n\ttagPath \u003d \"[.]\"\n\ttagPaths \u003d [t.replace(\"/tagPath/\", tagPath) for t in [\n\t\t\"/tagPath/EN\",\n\t\t\"/tagPath/D\",\n\t\t\"/tagPath/I\",\n\t\t\"/tagPath/Kd\",\n\t\t\"/tagPath/Ki\",\n\t\t\"/tagPath/Kp\",\n\t\t\"/tagPath/PV\",\n\t\t\"/tagPath/PVx\",\n\t\t\"/tagPath/SP\",\n\t\t\"/tagPath/CVmin\",\n\t\t\"/tagPath/CVmax\"\n\t]]\n\t\n\tli \u003d tag[\u0027parameters\u0027][\u0027LoopIntervalMillis\u0027]\n\t\n\t(en, d, i, kd, ki, kp, pv, pvx, sp, cvmin, cvmax) \u003d tuple([x.value for x in system.tag.readBlocking(tagPaths)])\n\t\n\tif not en: return\n\t\n\te \u003d sp - pv\n\t\n\tif pvx is None: pvx \u003d pv\n\t\n\tif kp is not None:\n\t\tp \u003d e * kp\n\telse:\n\t\tp \u003d 0.0\n\t\n\tif ki is not None:\n\t\ti +\u003d  e * ki * li / 1000\n\t\tif i \u003c cvmin: i \u003d cvmin\n\t\telif i \u003e cvmax: i \u003d cvmax\n\telse:\n\t\ti \u003d 0.0\n\t\n\tif kd is not None:\n\t\td \u003d (pvx - pv) * kd * li / 1000\n\telse:\n\t\td \u003d 0.0\n\t\n\tcv \u003d p + i + d\n\t\n\tif cv \u003c cvmin:\n\t\tcv \u003d cvmin\n\telif cv \u003e cvmax:\n\t\tcv \u003d cvmax\n\t\n\ttagPaths \u003d [t.replace(\"/tagPath/\", tagPath) for t in [\n\t\t\"/tagPath/CV\",\n\t\t\"/tagPath/D\",\n\t\t\"/tagPath/E\",\n\t\t\"/tagPath/I\",\n\t\t\"/tagPath/P\",\n\t\t\"/tagPath/PVx\"\n\t]]\n\tvalues \u003d [cv, d, e, i, p, pv]\n\tsystem.tag.writeBlocking(tagPaths, values)"
+            }
+          ],
+          "expression": "now({LoopIntervalMillis})",
+          "dataType": "DateTime",
+          "name": "T",
+          "formatString": "yyyy-MM-dd h:mm:ss aa",
+          "deadbandMode": "Absolute",
+          "tagType": "AtomicTag"
+        },
+        {
+          "valueSource": "reference",
+          "dataType": "Float8",
+          "name": "CV",
+          "deadbandMode": "Off",
+          "formatString": "#,##0.00000",
+          "tagType": "AtomicTag"
+        }
+      ]
+    }
+  ]
+}

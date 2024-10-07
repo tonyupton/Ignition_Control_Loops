@@ -1,0 +1,11 @@
+{
+  "pages": {
+    "/": {
+      "title": "",
+      "viewPath": "Historian"
+    }
+  },
+  "sharedDocks": {
+    "cornerPriority": "top-bottom"
+  }
+}

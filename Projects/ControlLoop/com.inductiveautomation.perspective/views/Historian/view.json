@@ -1,0 +1,262 @@
+{
+  "custom": {},
+  "params": {},
+  "props": {},
+  "root": {
+    "children": [
+      {
+        "meta": {
+          "name": "PowerChart"
+        },
+        "position": {
+          "basis": "600px",
+          "grow": 1
+        },
+        "props": {
+          "axes": [
+            {
+              "color": "#757A7F",
+              "dataFormat": "0,0.##",
+              "grid": {
+                "color": "#d5d4d4",
+                "dashArray": 0,
+                "opacity": 0.9,
+                "style": {
+                  "classes": ""
+                },
+                "visible": true
+              },
+              "label": {
+                "font": {
+                  "color": "#757A7F",
+                  "size": 10
+                },
+                "offset": 0,
+                "style": {
+                  "classes": ""
+                },
+                "text": ""
+              },
+              "name": "Default",
+              "position": "left",
+              "range": {
+                "auto": false,
+                "max": 0.2,
+                "min": 0
+              },
+              "style": {
+                "classes": ""
+              },
+              "tick": {
+                "color": "#757A7F",
+                "count": "Auto",
+                "label": {
+                  "font": {
+                    "color": "#757A7F",
+                    "size": 10
+                  },
+                  "format": "Auto",
+                  "style": {
+                    "classes": ""
+                  }
+                },
+                "style": {
+                  "classes": ""
+                }
+              },
+              "width": 60
+            }
+          ],
+          "config": {
+            "measureOfTime": "minutes",
+            "pointCount": 1000,
+            "rangeEndDate": {
+              "$": [
+                "ts",
+                0,
+                1728266689095
+              ],
+              "$ts": 1728266687807
+            },
+            "rangeStartDate": {
+              "$": [
+                "ts",
+                0,
+                1728266689095
+              ],
+              "$ts": 1728265489007
+            },
+            "unitOfTime": 20
+          },
+          "interaction": {
+            "chartZoomLevel": 1,
+            "rangeZoomLevel": 1
+          },
+          "pens": [
+            {
+              "axis": "",
+              "data": {
+                "aggregateMode": "Average",
+                "source": "histprov:Sample_SQLite_Database:/drv:desktopton:default:/tag:controlloop/pv"
+              },
+              "display": {
+                "breakLine": true,
+                "interpolation": "curveLinear",
+                "radius": 3,
+                "styles": {
+                  "highlighted": {
+                    "fill": {
+                      "color": "#63BEA2",
+                      "opacity": 1
+                    },
+                    "stroke": {
+                      "color": "#63BEA2",
+                      "dashArray": 0,
+                      "opacity": 1,
+                      "width": 1
+                    }
+                  },
+                  "muted": {
+                    "fill": {
+                      "color": "#63BEA2",
+                      "opacity": 0.4
+                    },
+                    "stroke": {
+                      "color": "#63BEA2",
+                      "dashArray": 0,
+                      "opacity": 0.4,
+                      "width": 1
+                    }
+                  },
+                  "normal": {
+                    "fill": {
+                      "color": "#63BEA2",
+                      "opacity": 0.8
+                    },
+                    "stroke": {
+                      "color": "#63BEA2",
+                      "dashArray": 0,
+                      "opacity": 0.8,
+                      "width": 1
+                    }
+                  },
+                  "selected": {
+                    "fill": {
+                      "color": "#63BEA2",
+                      "opacity": 1
+                    },
+                    "stroke": {
+                      "color": "#63BEA2",
+                      "dashArray": 0,
+                      "opacity": 1,
+                      "width": 1
+                    }
+                  }
+                },
+                "type": "line"
+              },
+              "enabled": true,
+              "name": "pv",
+              "plot": 0,
+              "selectable": true,
+              "visible": true
+            },
+            {
+              "axis": "",
+              "data": {
+                "aggregateMode": "default",
+                "source": "histprov:Sample_SQLite_Database:/drv:desktopton:default:/tag:controlloop/sp"
+              },
+              "display": {
+                "breakLine": true,
+                "interpolation": "curveLinear",
+                "radius": 3,
+                "styles": {
+                  "highlighted": {
+                    "fill": {
+                      "color": "#FC8D62",
+                      "opacity": 1
+                    },
+                    "stroke": {
+                      "color": "#FC8D62",
+                      "dashArray": 0,
+                      "opacity": 1,
+                      "width": 1
+                    }
+                  },
+                  "muted": {
+                    "fill": {
+                      "color": "#FC8D62",
+                      "opacity": 0.4
+                    },
+                    "stroke": {
+                      "color": "#FC8D62",
+                      "dashArray": 0,
+                      "opacity": 0.4,
+                      "width": 1
+                    }
+                  },
+                  "normal": {
+                    "fill": {
+                      "color": "#FC8D62",
+                      "opacity": 0.8
+                    },
+                    "stroke": {
+                      "color": "#FC8D62",
+                      "dashArray": 0,
+                      "opacity": 0.8,
+                      "width": 1
+                    }
+                  },
+                  "selected": {
+                    "fill": {
+                      "color": "#FC8D62",
+                      "opacity": 1
+                    },
+                    "stroke": {
+                      "color": "#FC8D62",
+                      "dashArray": 0,
+                      "opacity": 1,
+                      "width": 1
+                    }
+                  }
+                },
+                "type": "line"
+              },
+              "enabled": true,
+              "name": "sp",
+              "plot": 0,
+              "selectable": true,
+              "visible": true
+            }
+          ],
+          "plots": [
+            {
+              "color": "#FFFFFF80",
+              "markers": [],
+              "relativeWeight": 1,
+              "style": {
+                "classes": ""
+              }
+            }
+          ],
+          "timeAxis": {
+            "grid": {
+              "color": "#D5D5D5",
+              "visible": true
+            },
+            "height": "auto"
+          }
+        },
+        "type": "ia.chart.powerchart"
+      }
+    ],
+    "meta": {
+      "name": "root"
+    },
+    "props": {
+      "direction": "column"
+    },
+    "type": "ia.container.flex"
+  }
+}
